@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup as bs4
 global leadUrl
 
 global apiKey
-apiKey = 'RGAPI-2d5512bf-c40b-4c46-8c92-c9511a154264'
+apiKey = 'RGAPI-10bca866-f6d9-4afb-9a27-9ef4c1f748ec'
 
 global summId
 
@@ -121,10 +121,12 @@ def champ_masteries_by_summoner(summId):
             splitdict[splitvalue[0]] = splitvalue[1]
 
             count +=1
+
+    infoList = []
     for obj in dictionarylist:
 
         for k,v in obj.items():
-            print(k+' : '+v)
-    return dictionarylist
+            infoList.append('{}:{}\n'.format(k,v))
+    return infoList
 
 
