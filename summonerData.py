@@ -1,10 +1,12 @@
+import champids
+
 import requests
 
 from bs4 import BeautifulSoup as bs4
 global leadUrl
 
 global apiKey
-apiKey = 'RGAPI-10bca866-f6d9-4afb-9a27-9ef4c1f748ec'
+apiKey = 'RGAPI-4c03e04a-098f-4f51-8ca4-74e844355715'
 
 global summId
 
@@ -31,7 +33,7 @@ def sumLookup(summId,lookup):
         elif lookup == 'champ masters':
 
             leadUrl = 'lol/summoner/v3/summoners/by-name'
-            #first request finds the summoner Id for the name given in the search
+            #first request finds the summoner Id number for the name given in the search
             response = requests.get('https://na1.api.riotgames.com/{}/{}?api_key={}'.format(leadUrl,summId,apiKey))
 
             soup = bs4(response.text,'lxml')
@@ -102,13 +104,13 @@ def champ_masteries_by_summoner(summId):
     dictionarylist = []
 
     count = 1
-
+    #basic attributes of each lookup 
+    attributes = ['player id','champion id', 'champion level','champion points','last play time','champion points since last level','champ points to next level','chest granted']
     splitdict = dict()
-
     for item in comma_seperated:
-        
+    
         if count % 9 ==0:
-            dictionarylist.append(splitdict)
+            dictionarylist.append(splitdict.copy())
             
             count = 1
             
@@ -118,7 +120,7 @@ def champ_masteries_by_summoner(summId):
         else:
             splitvalue = item.split(':')
 
-            splitdict[splitvalue[0]] = splitvalue[1]
+            splitdict.update({attributes[count-1]:splitvalue[1]})
 
             count +=1
 
@@ -126,7 +128,13 @@ def champ_masteries_by_summoner(summId):
     for obj in dictionarylist:
 
         for k,v in obj.items():
-            infoList.append('{}:{}\n'.format(k,v))
+            if k == 'champion id':
+                v = champids.champion_ids[int(obj[k])]
+            if k != 'player id' and k != 'chest granted':
+                infoList.append('{}:{}\n'.format(k,v))
+            elif k == 'chest granted':
+                infoList.append('{}:{}\n-----------------------\n'.format(k,v))
+            
     return infoList
 
 

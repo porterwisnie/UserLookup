@@ -12,8 +12,10 @@ class Window(Frame):
         Frame.__init__(self, master)
 
         self.master = master
-
+        self.champmastery = IntVar()
         self.init_window()
+
+        
 
     def init_window(self):
 
@@ -22,22 +24,8 @@ class Window(Frame):
         menu = Menu(self.master)
 
         self.master.config(menu=menu)
-        
-        #label for main search function
 
-        sumLbl = Label(root,text='Username Lookup')
-        
-        sumLbl.pack(side=LEFT,padx=5)
-
-        #defines the entry field for the lookup username
-
-        self.lookupName = Entry(root,width=20,font=('times','13','bold'))
-
-        self.lookupName.pack(side=LEFT,padx=5)
-
-        Button(root,text='Search',command=self.find_summoner).pack(side=LEFT,padx=30,pady=5)
-
-        #scrollbar function in the returning text window
+   #scrollbar function in the returning text window
         
         scroll = Scrollbar(root)
 
@@ -51,6 +39,40 @@ class Window(Frame):
     
         self.textArea.config(yscrollcommand=scroll.set)
     
+        
+        #label for main search function
+
+        sumLbl = Label(root,text='League of Legends Username Lookup',font=('times','15','bold'))
+        
+        sumLbl.pack(pady=50)
+
+        #defines the entry field for the lookup username
+
+        self.lookupName = Entry(root,width=20,font=('times','13','bold'))
+
+        self.lookupName.pack(pady=10)
+
+       #search check options
+
+        options = [
+                'users stats by champion',
+
+                'basic account info'
+                ]
+
+        self.option = StringVar()
+
+        self.option.set(options[0])
+
+        option_menu = OptionMenu(root, self.option, *options)
+        
+        option_menu.pack(pady=10)
+        #champ_option = Checkbutton(root,text='champion mastery info',variable=self.champmastery)
+
+       # champ_option.pack()
+        
+        Button(root,text='Search',command=self.find_summoner).pack(pady=10)
+     
         #toolbar options
         file = Menu(menu)
 
@@ -93,10 +115,18 @@ class Window(Frame):
         else:
 
             userId = self.lookupName.get()
-            
-            data = summonerData.champ_masteries_by_summoner(userId)
 
-            self.textArea.insert(END,data)
+            if self.option.get() == 'users stats by champion':
+
+            
+                data = summonerData.champ_masteries_by_summoner(userId)
+
+                self.textArea.insert(END,data)
+
+
+            else:
+
+                self.textArea.insert(END,summonerData.basic_info(userId,'base'))
 
         self.lookupName.delete(0,END)
 

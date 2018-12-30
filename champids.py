@@ -77,6 +77,7 @@ champion_ids = {
     267:"Nami",
     75:"Nasus",
     111:"Nautilus",
+    518:"Neeko",
     76:"Nidalee",
     56:"Nocturne",
     20:"Nunu",
