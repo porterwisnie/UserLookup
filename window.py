@@ -5,6 +5,8 @@ import time
 import PIL.Image 
 import PIL.ImageTk
 from tkinter import *
+import champids
+import queuetypes
 
 class Window(Frame):
 
@@ -57,7 +59,9 @@ class Window(Frame):
         options = [
                 'users stats by champion',
 
-                'basic account info'
+                'basic account info',
+
+                'match history'
                 ]
 
         self.option = StringVar()
@@ -66,10 +70,7 @@ class Window(Frame):
 
         option_menu = OptionMenu(root, self.option, *options)
         
-        option_menu.pack(pady=10)
-        #champ_option = Checkbutton(root,text='champion mastery info',variable=self.champmastery)
-
-       # champ_option.pack()
+        option_menu.pack(pady=10) 
         
         Button(root,text='Search',command=self.find_summoner).pack(pady=10)
      
@@ -129,8 +130,28 @@ class Window(Frame):
                 data = summonerData.champ_masteries_by_summoner(userId)
 
                 self.textArea.insert(END,data)
+            elif self.option.get() == 'match history':
 
+                data = summonerData.recent_matches(userId)
 
+                match_info = ['lane','champion','queue']
+
+                for match in range(0,len(data)-1):
+                    
+                    for constant in match_info:
+                        if constant == 'champion':
+                            self.textArea.insert(END,constant + ': ' + champids.champion_ids[data[match][constant]] + '\n')
+
+                        elif constant == 'queue':
+                            try:
+                                self.textArea.insert(END, constant+ ': ' + queuetypes.queues[data[match]['queue']]+'\n')
+                            except:
+                                self.textArea.insert(END,constant + ': ' + str(data[match][constant]) + '\n')
+                           
+                            self.textArea.insert(END,'----------------\n')
+
+                        else:
+                            self.textArea.insert(END,constant + ': ' + str(data[match][constant]) + '\n')
             else:
 
                 self.textArea.insert(END,summonerData.basic_info(userId,'base'))

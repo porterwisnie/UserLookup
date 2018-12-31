@@ -2,6 +2,8 @@ import champids
 
 import requests
 
+import json
+
 from bs4 import BeautifulSoup as bs4
 global leadUrl
 
@@ -54,7 +56,31 @@ def sumLookup(summId,lookup):
 
             leadUrl = 'lol/champion-mastery/v3/champion-masteries/by-summoner'
             return [summId,leadUrl]
+        elif lookup == 'recent matches':
 
+            leadUrl = 'lol/summoner/v3/summoners/by-name'
+            #first request finds the summoner Id number for the name given in the search
+            response = requests.get('https://na1.api.riotgames.com/{}/{}?api_key={}'.format(leadUrl,summId,apiKey))
+
+            soup = bs4(response.text,'lxml')
+
+            x = soup.get_text()
+        
+            comma_seperated = x.split(',')
+    
+            dictionary = {}
+    
+            for item in comma_seperated:
+
+                splitvalue = item.split(':')
+
+                dictionary[splitvalue[0]] = splitvalue[1]
+            #summoner Id is equal to the number value given by riot games here 
+            
+            summId = dictionary['\"accountId\"']
+
+            return summId
+            
 #below is the request and basic processing for the terms defined above
 def single_response_as_dict(leadUrl,summId,apiKey):
 
@@ -83,8 +109,31 @@ def basic_info(summId,lookup):
     leadUrl = response[1]
     
     x = single_response_as_dict(leadUrl,summId,apiKey)
+
+def recent_matches(summId):
+    summId = sumLookup(summId,'recent matches')
+
+    leadUrl = 'lol/match/v3/matchlists/by-account'
+
+    response = requests.get('https://na1.api.riotgames.com/{}/{}?api_key={}'.format(leadUrl,summId,apiKey))
+   
+    soup = bs4(response.text,'lxml')
+
+    x = soup.get_text()
+
+    comma_seperated = x.split(',')
+
+    dictionarylist = []
+
+    count = 1
+
+    json_response = json.loads(x)
+
+    return json_response['matches'] 
     
-    return x
+
+
+    
 def champ_masteries_by_summoner(summId):
     #requests the info 
     response = sumLookup(summId,'champ masters')
