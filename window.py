@@ -84,7 +84,7 @@ class Window(Frame):
 
         lookup = Menu(menu)
         
-        lookup.add_command(label = 'by name',command=self.find_summoner_toolbar)
+        lookup.add_command(label = 'My basic info',command=self.find_summoner_toolbar)
 
         menu.add_cascade(label='Lookup',menu=lookup)
 
@@ -108,6 +108,13 @@ class Window(Frame):
         popup.config(bg='gray75')
     
     def find_summoner(self):
+        try:
+
+            self.textArea.delete('1.0',END)
+
+        except:
+            pass
+
         if self.lookupName.get() == '':
                
             self.textArea.insert(END,'Please try entering a username')

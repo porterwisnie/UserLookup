@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup as bs4
 global leadUrl
 
 global apiKey
-apiKey = 'RGAPI-4c03e04a-098f-4f51-8ca4-74e844355715'
+apiKey = 'RGAPI-63575af8-bd4f-42f5-935d-c06d74c6b84c'
 
 global summId
 
@@ -114,9 +114,6 @@ def champ_masteries_by_summoner(summId):
             
             count = 1
             
-            
-
-            
         else:
             splitvalue = item.split(':')
 
@@ -134,7 +131,7 @@ def champ_masteries_by_summoner(summId):
                 infoList.append('{}:{}\n'.format(k,v))
             elif k == 'chest granted':
                 infoList.append('{}:{}\n-----------------------\n'.format(k,v))
-            
+     
     return infoList
 
 
