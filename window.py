@@ -44,7 +44,7 @@ class Window(Frame):
         
         #label for main search function
 
-        sumLbl = Label(root,text='League of Legends Username Lookup',font=('times','15','bold'))
+        sumLbl = Label(root,text='Stats Lookup\n for League of Legends',font=('times','15','bold'))
         
         sumLbl.pack(pady=50)
 
@@ -61,8 +61,18 @@ class Window(Frame):
 
                 'basic account info',
 
-                'match history'
+                'match history',
+
+                'account last match indepth',
+
+                'lookup by game id'
                 ]
+        #defines the game lookup by id search field
+
+        self.lookupGame = Entry(root,width=20,font=('times','13','bold'))
+
+        self.lookupGame.pack(pady=10)
+
 
         self.option = StringVar()
 
@@ -116,9 +126,9 @@ class Window(Frame):
         except:
             pass
 
-        if self.lookupName.get() == '':
+        if self.lookupName.get() == '' and len(self.lookupGame.get()) != 10 and str(self.lookupGame.get()).isnum() == False:
                
-            self.textArea.insert(END,'Please try entering a username')
+            self.textArea.insert(END,'Please enter a username or a valid game id')
 
         else:
 
@@ -134,7 +144,7 @@ class Window(Frame):
 
                 data = summonerData.recent_matches(userId)
 
-                match_info = ['lane','champion','queue']
+                match_info = ['gameId','lane','champion','queue']
 
                 for match in range(0,len(data)-1):
                     
@@ -152,6 +162,18 @@ class Window(Frame):
 
                         else:
                             self.textArea.insert(END,constant + ': ' + str(data[match][constant]) + '\n')
+            elif self.option.get() == 'account last match indepth':
+                
+                data = summonerData.indepth_game(userId)
+
+                self.textArea.insert(END,data)
+            elif self.option.get() == 'lookup by game id':
+
+                data = summonerData.game_byId(self.lookupGame.get())
+
+                self.textArea.insert(END,data)
+
+
             else:
 
                 self.textArea.insert(END,summonerData.basic_info(userId,'base'))

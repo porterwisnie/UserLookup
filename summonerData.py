@@ -121,16 +121,40 @@ def recent_matches(summId):
 
     x = soup.get_text()
 
-    comma_seperated = x.split(',')
-
-    dictionarylist = []
-
-    count = 1
-
     json_response = json.loads(x)
 
     return json_response['matches'] 
-    
+
+def indepth_game(summId):
+    json_response = recent_matches(summId) 
+
+    game_id = json_response[0]['gameId']
+
+    leadUrl = 'lol/match/v3/matches'
+
+    response = requests.get('https://na1.api.riotgames.com/{}/{}?api_key={}'.format(leadUrl,game_id,apiKey))
+
+    soup = bs4(response.text,'lxml')
+
+    x = soup.get_text()
+
+    data = json.loads(x)
+
+    return data
+
+def game_byId(gameId):
+
+    leadUrl = 'lol/match/v3/matches'
+
+    response = requests.get('https://na1.api.riotgames.com/{}/{}?api_key={}'.format(leadUrl,gameId,apiKey))
+
+    soup = bs4(response.text,'lxml')
+
+    x = soup.get_text()
+
+    data = json.loads(x)
+
+    return data
 
 
     
