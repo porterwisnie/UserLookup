@@ -27,20 +27,25 @@ class Window(Frame):
 
         self.master.config(menu=menu)
 
-   #scrollbar function in the returning text window
-        
-        scroll = Scrollbar(root)
+        frame = Frame(root,height=300,width=300)
 
-        self.textArea = Text(root, height=25, width=80,font=('times','13','bold'))
+        frame.pack(side=RIGHT,fill=Y)
+
+   #scrollbar function in the returning  frame
+        
+        scroll = Scrollbar(frame)
+
+        self.textArea = Canvas(frame,width=800,bg='white')
 
         scroll.pack(side=RIGHT, fill=Y)
 
-        self.textArea.pack(side=RIGHT, fill=Y)
-    
+            
         scroll.config(command=self.textArea.yview)
     
         self.textArea.config(yscrollcommand=scroll.set)
-    
+        
+        self.textArea.pack(side=RIGHT, fill=Y)
+
         
         #label for main search function
 
@@ -57,22 +62,10 @@ class Window(Frame):
        #search check options
 
         options = [
-                'users stats by champion',
-
-                'basic account info',
-
-                'match history',
-
-                'account last match indepth',
-
-                'lookup by game id'
+                'Match History',
+                'Champion Mastery'
                 ]
         #defines the game lookup by id search field
-
-        self.lookupGame = Entry(root,width=20,font=('times','13','bold'))
-
-        self.lookupGame.pack(pady=10)
-
 
         self.option = StringVar()
 
@@ -126,59 +119,96 @@ class Window(Frame):
         except:
             pass
 
-        if self.lookupName.get() == '' and len(self.lookupGame.get()) != 10 and str(self.lookupGame.get()).isnum() == False:
-               
-            self.textArea.insert(END,'Please enter a username or a valid game id')
+        if self.lookupName.get() == '':               
+            canvas_id = self.textArea.create_text(0,0,anchor='nw')
+            
+            self.textArea.itemconfig(canvas_id,text='Please enter a username or a valid game id')
 
         else:
 
             userId = self.lookupName.get()
 
-            if self.option.get() == 'users stats by champion':
+            if self.option.get() == 'Champion Mastery':
 
             
                 data = summonerData.champ_masteries_by_summoner(userId)
 
-                self.textArea.insert(END,data)
-            elif self.option.get() == 'match history':
+            
+                canvas_id = self.textArea.create_text(10,10,anchor='nw')
 
+                self.textArea.itemconfig(canvas_id,text=data)
+                self.textArea.insert(canvas_id,13,"new ")
+
+
+            elif self.option.get() == 'Match History':
+
+
+ 
                 data = summonerData.recent_matches(userId)
 
-                match_info = ['gameId','lane','champion','queue']
+                
 
+                match_info = ['gameId','lane','champion','queue']
+                recent_match_overview = []
                 for match in range(0,len(data)-1):
-                    
+                    match_dict = {}
                     for constant in match_info:
                         if constant == 'champion':
-                            self.textArea.insert(END,constant + ': ' + champids.champion_ids[data[match][constant]] + '\n')
-
+                            match_dict['champion'] = champids.champion_ids[data[match]['champion']]
                         elif constant == 'queue':
-                            try:
-                                self.textArea.insert(END, constant+ ': ' + queuetypes.queues[data[match]['queue']]+'\n')
-                            except:
-                                self.textArea.insert(END,constant + ': ' + str(data[match][constant]) + '\n')
+                    
+                            match_dict['queue'] = queuetypes.queues[data[match]['queue']]
                            
-                            self.textArea.insert(END,'----------------\n')
+                        
 
                         else:
-                            self.textArea.insert(END,constant + ': ' + str(data[match][constant]) + '\n')
-            elif self.option.get() == 'account last match indepth':
+                            match_dict[constant] = data[match][constant]
+                    recent_match_overview.append(dict(match_dict)) 
+
+                game_list = []
+                  
+                for game in recent_match_overview:
+
+                    game_info = summonerData.game_byId(game['gameId'])
+
+                    game_list.append(game_info)
+
+
+                    '''
+                    before this sleep timer the objective is to have code that creates a replicating rectangle with:
+                        
+                        Username and K/D/A
+                        ?intergrate champion pics to show who they were playing?
+                        
+                    then have a bar across the bottom of these stats with button/buttons for more info
+
+                    ---------------------------------------------------------------
+                    |                      |"more info"|                          |
+                    ---------------------------------------------------------------
+
+                    something like this to have at the bottom of each in the canvas on the right
+
+                    have the button make a popup that gives advanced/more indepth stats
+
+                    ?graphing options with variable x and y axis for comparison?
+
+                    ***IMPORTANT***
+
+                    make it so ALL of the info is still easily accesible for data interpertation in the popup
+
+                    basically so i can use everything later on if I need to
+
+                    _________________________________________________________________________
+
+                    
+                    '''
+
+                    time.sleep(1)
+
                 
-                data = summonerData.indepth_game(userId)
+                print(game_list)
 
-                self.textArea.insert(END,data)
-            elif self.option.get() == 'lookup by game id':
-
-                data = summonerData.game_byId(self.lookupGame.get())
-
-                self.textArea.insert(END,data)
-
-
-            else:
-
-                self.textArea.insert(END,summonerData.basic_info(userId,'base'))
-
-        self.lookupName.delete(0,END)
+            
 
     def find_summoner_toolbar(self):
 

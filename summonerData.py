@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup as bs4
 global leadUrl
 
 global apiKey
-apiKey = 'RGAPI-63575af8-bd4f-42f5-935d-c06d74c6b84c'
+apiKey = 'RGAPI-2e7f6afb-c13b-4567-b44b-c16c9281258f'
 
 global summId
 
@@ -115,7 +115,7 @@ def recent_matches(summId):
 
     leadUrl = 'lol/match/v3/matchlists/by-account'
 
-    response = requests.get('https://na1.api.riotgames.com/{}/{}?api_key={}'.format(leadUrl,summId,apiKey))
+    response = requests.get('https://na1.api.riotgames.com/{}/{}?endIndex=20&api_key={}'.format(leadUrl,summId,apiKey))
    
     soup = bs4(response.text,'lxml')
 
