@@ -4,11 +4,15 @@ import requests
 
 import json
 
+import os
+
 from bs4 import BeautifulSoup as bs4
+
+from PIL import Image
 global leadUrl
 
 global apiKey
-apiKey = 'RGAPI-2e7f6afb-c13b-4567-b44b-c16c9281258f'
+apiKey = 'RGAPI-fa5419f0-1aa5-4a81-8153-c1948f63bed4'
 
 global summId
 
@@ -207,4 +211,25 @@ def champ_masteries_by_summoner(summId):
      
     return infoList
 
+#gets image for each item id
+
+def getitem(item):
+
+#returns path to the image of item
+
+    pwd = os.getcwd()
+    if os.path.isfile('{}/items/{}.png'.format(pwd,item)) == False:
+        response = requests.get('http://ddragon.leagueoflegends.com/cdn/9.1.1/img/item/{}.png'.format(item))
+
+        time.sleep(.75)
+
+        if response.status_code == 200:
+            with open('{}/items/{}.png'.format(pwd,item),'wb') as f:
+                f.write(response.content)
+    return "{}/items/{}.png".format(pwd,item)
+    
+        
+            
+                
+            
 
