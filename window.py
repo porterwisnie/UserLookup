@@ -16,8 +16,9 @@ class Window(Frame):
         self.master = master
         self.champmastery = IntVar()
         self.init_window()
-
-        
+        self.game_list = []
+        #used by the find_summoner method and the more_stats function for identifying which game was clicked
+        self.gamenum = 0
 
     def init_window(self):
 
@@ -35,7 +36,7 @@ class Window(Frame):
         
         scroll = Scrollbar(frame)
 
-        self.textArea = Canvas(frame,width=800,bg='white')
+        self.textArea = Canvas(frame,width=1000,bg='white')
 
         scroll.pack(side=RIGHT, fill=Y)
 
@@ -43,10 +44,11 @@ class Window(Frame):
         scroll.config(command=self.textArea.yview)
     
         self.textArea.config(yscrollcommand=scroll.set)
+
+        self.textArea.config(yscrollincrement='5')
         
         self.textArea.pack(side=RIGHT, fill=Y)
 
-        
         #label for main search function
 
         sumLbl = Label(root,text='Stats Lookup\n for League of Legends',font=('times','15','bold'))
@@ -91,7 +93,9 @@ class Window(Frame):
         lookup.add_command(label = 'My basic info',command=self.find_summoner_toolbar)
 
         menu.add_cascade(label='Lookup',menu=lookup)
-
+        tip = Label(root,text='tip: click on game to see more info',font=('times','13','bold'))
+        
+        tip.pack(pady=50)
     def client_exit(self):
             
         exit()
@@ -110,6 +114,7 @@ class Window(Frame):
         popup.geometry('600x350')
 
         popup.config(bg='gray75')
+   
     
     def find_summoner(self):
         try:
@@ -146,8 +151,6 @@ class Window(Frame):
  
                 data = summonerData.recent_matches(userId)
 
-                
-
                 match_info = ['gameId','lane','champion','queue']
                 recent_match_overview = []
                 for match in range(0,len(data)-1):
@@ -165,13 +168,71 @@ class Window(Frame):
                             match_dict[constant] = data[match][constant]
                     recent_match_overview.append(dict(match_dict)) 
 
-                game_list = []
+                
                   
                 for game in recent_match_overview:
 
-                    game_info = summonerData.game_byId(game['gameId'])
+                    self.game_list.append(summonerData.game_byId(game['gameId']))
+                
 
-                    game_list.append(game_info)
+                xpos = 50
+
+                ypos = 10
+
+                team2ypos = 10
+
+                fillcolor = 'red'
+
+                for game in self.game_list:
+
+                    
+                
+                    identity = game['participantIdentities'] 
+
+                    per_game_area = self.textArea.create_rectangle(0,ypos-10,1000,ypos+400,fill=fillcolor,tags=str(self.gamenum))
+
+                    self.gamenum += 1
+
+                    for participant in range(0,10):
+
+                        indiv_data = game['participants'][participant] 
+
+                        if self.lookupName.get() == identity[participant]['player']['summonerName'] and indiv_data['stats']['win'] == True:
+
+                            self.textArea.itemconfig(per_game_area,fill='green')
+                         
+                        if participant == 0:
+
+                            self.textArea.create_text((50,ypos),text='Winning team',anchor='w')
+
+                            self.textArea.create_text((550,team2ypos),text='Losing team',anchor='w')
+
+                            ypos += 30
+
+                            team2ypos += 30
+
+                        if indiv_data['stats']['win'] == False:
+
+                            xpos = 550
+
+                            self.textArea.create_text((xpos,team2ypos),text=str(identity[participant]['player']['summonerName'])+'\n   '+str(champids.champion_ids[indiv_data['championId']])+'   '+str(indiv_data['stats']['kills'])+'/'+str(indiv_data['stats']['deaths'])+'/'+str(indiv_data['stats']['assists']),anchor='w')
+                            
+                            team2ypos +=40
+                        else:
+                            xpos = 50
+     
+                            self.textArea.create_text((xpos,ypos),text=str(identity[participant]['player']['summonerName'])+'\n   '+str(champids.champion_ids[indiv_data['championId']])+'   '+str(indiv_data['stats']['kills'])+'/'+str(indiv_data['stats']['deaths'])+'/'+str(indiv_data['stats']['assists']),anchor='w')
+            
+                            ypos += 40
+
+                        if participant == 9:            
+                           
+                            self.textArea.tag_bind(per_game_area,'<Button-1>',self.ongame_click)
+
+
+
+
+
 
 
                     '''
@@ -203,10 +264,135 @@ class Window(Frame):
                     
                     '''
 
+
                     time.sleep(1)
 
+    def ongame_click(self,other): 
+
+        x = int(self.textArea.find_withtag("current")[0])
+  
+        self.gamenum = (x-1)//13
+        
+        self.more_stats()
+    def more_stats(self):
+
+        ## Notes for next time
+        # Find a way to track which game is clicked on 
+        #fix formatting with the popup after only the selected game is shown
+        popup = Toplevel()
+
+        message = "Game Info"
+        
+        Label(popup,text=message,wraplength=500,font=('Courier',14,'bold'),fg='black',bg='gray75').pack()
+        
+        popup.title('More Stats')
+
+        popup.geometry('1000x700')
+
+        popup.config(bg='gray75') 
+
+        
+        #####
+        pframe = Frame(popup,height=800,width=700)
+
+        pframe.pack()
+
+        scroll = Scrollbar(pframe)
+
+        ptextArea = Canvas(pframe,width=1000,bg='white',height=600)
+
+        scroll.pack(side=RIGHT, fill=Y)
+
+            
+        scroll.config(command=ptextArea.yview)
+    
+        ptextArea.config(yscrollcommand=scroll.set)
+
+        ptextArea.config(yscrollincrement='5')
+        
+        ptextArea.pack()
+        #####
+        ypos = 40
+
+        xpos = 40
+
+        team2ypos = 300
+
+        game = self.game_list[self.gamenum]
                 
-                print(game_list)
+        identity = game['participantIdentities'] 
+
+        for participant in range(0,10):
+
+            indiv_data = game['participants'][participant] 
+
+            player_highlight = 'white'
+
+            itemxpos = 400
+
+            if self.lookupName.get() == identity[participant]['player']['summonerName'] and indiv_data['stats']['win'] == True:
+                #use this if statement to match who the lookup was searching for
+                player_highlight = 'gray'
+             
+            if participant == 0: 
+
+                ptextArea.create_text((xpos,ypos),text='Winning team',anchor='w')
+                #labels for the columns of data
+                ptextArea.create_text((xpos+300,ypos),text='Gold\nSpent|Earned',anchor='w')
+                
+                ptextArea.create_text((xpos+800,ypos),text='Vision\nScore',anchor='w')
+
+                ypos += 40
+
+                ptextArea.create_text((xpos,team2ypos),text='Losing team',anchor='w')
+
+                team2ypos+=40
+
+            if indiv_data['stats']['win'] == False:
+
+                ptextArea.create_text((xpos,team2ypos),text=(str(identity[participant]['player']['summonerName']))+'\n   '+str(champids.champion_ids[indiv_data['championId']])+'   '+str(indiv_data['stats']['kills'])+'/'+str(indiv_data['stats']['deaths'])+'/'+str(indiv_data['stats']['assists']),anchor='w')
+
+                ptextArea.create_text((xpos+800,team2ypos),text=str(indiv_data['stats']['visionScore']))
+                
+                ptextArea.create_text((xpos+300,team2ypos),text=str(indiv_data['stats']['goldSpent'])+'|'+str(indiv_data['stats']['goldEarned']),anchor='w')
+
+                item_list = []
+
+                for num in range(0,7,1): 
+                    itemId = indiv_data['stats']['item{}'.format(str(num))]
+
+                    if itemId > 0:
+                    
+                
+                        image_string = summonerData.getitem(itemId)
+
+                        item_list.append([itemxpos,team2ypos,image_string])
+
+                        #image = PhotoImage(file=image_string)
+                    
+                        #ptextArea.create_image((itemxpos,team2ypos),image=image,anchor='w')
+
+                        itemxpos+=30
+
+                        
+                for item in item_list:
+
+                    image = PhotoImage(file=item[2])
+
+                    ptextArea.create_image((item[0],item[1]),image=image)
+ 
+                team2ypos +=40
+            else:
+
+                ptextArea.create_text((xpos,ypos),text=(str(identity[participant]['player']['summonerName']))+'\n   '+str(champids.champion_ids[indiv_data['championId']])+'   '+str(indiv_data['stats']['kills'])+'/'+str(indiv_data['stats']['deaths'])+'/'+str(indiv_data['stats']['assists']),anchor='w')
+
+                ptextArea.create_text((xpos+800,ypos),text=str(indiv_data['stats']['visionScore']),anchor='w')
+
+                ptextArea.create_text((xpos+300,ypos),text=str(indiv_data['stats']['goldSpent'])+'|'+str(indiv_data['stats']['goldEarned']),anchor='w')
+
+                ypos +=40
+    
+
 
             
 
