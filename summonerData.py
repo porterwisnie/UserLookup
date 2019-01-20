@@ -9,10 +9,12 @@ import os
 from bs4 import BeautifulSoup as bs4
 
 from PIL import Image
+
+import time
 global leadUrl
 
 global apiKey
-apiKey = 'RGAPI-fa5419f0-1aa5-4a81-8153-c1948f63bed4'
+apiKey = 'RGAPI-befac1d3-0114-400b-96d9-cccacb3ebba8'
 
 global summId
 
