@@ -19,6 +19,10 @@ class Window(Frame):
         self.game_list = []
         #used by the find_summoner method and the more_stats function for identifying which game was clicked
         self.gamenum = 0
+        self.itemImages = []
+
+        master.bind('<Return>',self.find_summoner_enter)
+
 
     def init_window(self):
 
@@ -31,7 +35,6 @@ class Window(Frame):
         frame = Frame(root,height=300,width=300)
 
         frame.pack(side=RIGHT,fill=Y)
-
    #scrollbar function in the returning  frame
 
         scroll = Scrollbar(frame)
@@ -49,6 +52,8 @@ class Window(Frame):
 
         self.textArea.pack(side=RIGHT, fill=Y)
 
+
+       
         #label for main search function
 
         sumLbl = Label(root,text='Stats Lookup\n for League of Legends',font=('times','15','bold'))
@@ -116,6 +121,14 @@ class Window(Frame):
         popup.config(bg='gray75')
 
 
+<<<<<<< HEAD
+=======
+    def find_summoner_enter(self,event=None):
+        
+        self.find_summoner()
+   
+    
+>>>>>>> master
     def find_summoner(self):
         try:
 
@@ -328,7 +341,7 @@ class Window(Frame):
 
             player_highlight = 'white'
 
-            itemxpos = 400
+            itemxpos = 525
 
             if self.lookupName.get() == identity[participant]['player']['summonerName'] and indiv_data['stats']['win'] == True:
                 #use this if statement to match who the lookup was searching for
@@ -341,6 +354,8 @@ class Window(Frame):
                 ptextArea.create_text((xpos+300,ypos),text='Gold\nSpent|Earned',anchor='w')
 
                 ptextArea.create_text((xpos+800,ypos),text='Vision\nScore',anchor='w')
+
+                ptextArea.create_text((xpos+550,ypos),text='Items',anchor='w')
 
                 ypos += 40
 
@@ -370,12 +385,26 @@ class Window(Frame):
 
 
                 for item in item_list:
+<<<<<<< HEAD
                     photo = PIL.Image.open(item[2])
 
                     image = PIL.ImageTk.PhotoImage(file=photo)
 
                     ptextArea.create_image((item[0],item[1]),image=photo,anchor='w')
 
+=======
+                    
+                    item_image = PIL.Image.open(item[2])
+
+                    item_image = item_image.resize((30,30),PIL.Image.ANTIALIAS)
+
+                    itemimg = PIL.ImageTk.PhotoImage(item_image)
+
+                    ptextArea.create_image((item[0],item[1]),image = itemimg,anchor='w')
+
+                    self.itemImages.append(itemimg)
+ 
+>>>>>>> master
                 team2ypos +=40
             else:
 
@@ -384,6 +413,41 @@ class Window(Frame):
                 ptextArea.create_text((xpos+800,ypos),text=str(indiv_data['stats']['visionScore']),anchor='w')
 
                 ptextArea.create_text((xpos+300,ypos),text=str(indiv_data['stats']['goldSpent'])+'|'+str(indiv_data['stats']['goldEarned']),anchor='w')
+
+                item_list = []
+
+                for num in range(0,7,1): 
+                    itemId = indiv_data['stats']['item{}'.format(str(num))]
+
+                    if itemId > 0:
+                    
+                
+                        image_string = summonerData.getitem(itemId)
+
+                        item_list.append([itemxpos,ypos,image_string])
+
+                        #image = PhotoImage(file=image_string)
+                    
+                        #ptextArea.create_image((itemxpos,team2ypos),image=image,anchor='w')
+
+                        itemxpos+=30
+
+                            
+                    for item in item_list:
+                        
+                        item_image = PIL.Image.open(item[2])
+
+                        item_image = item_image.resize((30,30),PIL.Image.ANTIALIAS)
+
+                        itemimg =  PIL.ImageTk.PhotoImage(item_image,width=100,height=100)
+
+                        
+
+                        ptextArea.create_image((item[0],item[1]),image = itemimg,anchor='w')
+
+                        self.itemImages.append(itemimg)
+     
+                        
 
                 ypos +=40
 

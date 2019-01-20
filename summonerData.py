@@ -12,10 +12,19 @@ from bs4 import BeautifulSoup as bs4
 
 from PIL import Image
 
+<<<<<<< HEAD
+=======
+import time
+>>>>>>> master
 global leadUrl
+#test comment for ssh test
 
 global apiKey
+<<<<<<< HEAD
 apiKey = 'RGAPI-886fd300-12e3-4d40-a635-0b76e228e7da'
+=======
+apiKey = 'RGAPI-befac1d3-0114-400b-96d9-cccacb3ebba8'
+>>>>>>> master
 
 global summId
 
