@@ -4,15 +4,18 @@ import requests
 
 import json
 
+import time
+
 import os
 
 from bs4 import BeautifulSoup as bs4
 
 from PIL import Image
+
 global leadUrl
 
 global apiKey
-apiKey = 'RGAPI-fa5419f0-1aa5-4a81-8153-c1948f63bed4'
+apiKey = 'RGAPI-886fd300-12e3-4d40-a635-0b76e228e7da'
 
 global summId
 
@@ -45,17 +48,17 @@ def sumLookup(summId,lookup):
             soup = bs4(response.text,'lxml')
 
             x = soup.get_text()
-        
+
             comma_seperated = x.split(',')
-    
+
             dictionary = {}
-    
+
             for item in comma_seperated:
 
                 splitvalue = item.split(':')
 
                 dictionary[splitvalue[0]] = splitvalue[1]
-            #summoner Id is equal to the number value given by riot games here 
+            #summoner Id is equal to the number value given by riot games here
             summId = dictionary['{"id"']
 
             leadUrl = 'lol/champion-mastery/v3/champion-masteries/by-summoner'
@@ -69,22 +72,22 @@ def sumLookup(summId,lookup):
             soup = bs4(response.text,'lxml')
 
             x = soup.get_text()
-        
+
             comma_seperated = x.split(',')
-    
+
             dictionary = {}
-    
+
             for item in comma_seperated:
 
                 splitvalue = item.split(':')
 
                 dictionary[splitvalue[0]] = splitvalue[1]
-            #summoner Id is equal to the number value given by riot games here 
-            
+            #summoner Id is equal to the number value given by riot games here
+
             summId = dictionary['\"accountId\"']
 
             return summId
-            
+
 #below is the request and basic processing for the terms defined above
 def single_response_as_dict(leadUrl,summId,apiKey):
 
@@ -93,11 +96,11 @@ def single_response_as_dict(leadUrl,summId,apiKey):
     soup = bs4(response.text,'lxml')
 
     x = soup.get_text()
-        
+
     comma_seperated = x.split(',')
-    
+
     dictionary = {}
-    
+
     for item in comma_seperated:
 
         splitvalue = item.split(':')
@@ -111,7 +114,7 @@ def basic_info(summId,lookup):
     summId = response[0]
 
     leadUrl = response[1]
-    
+
     x = single_response_as_dict(leadUrl,summId,apiKey)
 
 def recent_matches(summId):
@@ -120,17 +123,17 @@ def recent_matches(summId):
     leadUrl = 'lol/match/v3/matchlists/by-account'
 
     response = requests.get('https://na1.api.riotgames.com/{}/{}?endIndex=20&api_key={}'.format(leadUrl,summId,apiKey))
-   
+
     soup = bs4(response.text,'lxml')
 
     x = soup.get_text()
 
     json_response = json.loads(x)
 
-    return json_response['matches'] 
+    return json_response['matches']
 
 def indepth_game(summId):
-    json_response = recent_matches(summId) 
+    json_response = recent_matches(summId)
 
     game_id = json_response[0]['gameId']
 
@@ -161,9 +164,9 @@ def game_byId(gameId):
     return data
 
 
-    
+
 def champ_masteries_by_summoner(summId):
-    #requests the info 
+    #requests the info
     response = sumLookup(summId,'champ masters')
 
     summId = response[0]
@@ -175,22 +178,22 @@ def champ_masteries_by_summoner(summId):
     soup = bs4(response.text,'lxml')
 
     x = soup.get_text()
-        
+
     comma_seperated = x.split(',')
 
     dictionarylist = []
 
     count = 1
-    #basic attributes of each lookup 
+    #basic attributes of each lookup
     attributes = ['player id','champion id', 'champion level','champion points','last play time','champion points since last level','champ points to next level','chest granted']
     splitdict = dict()
     for item in comma_seperated:
-    
+
         if count % 9 ==0:
             dictionarylist.append(splitdict.copy())
-            
+
             count = 1
-            
+
         else:
             splitvalue = item.split(':')
 
@@ -208,7 +211,7 @@ def champ_masteries_by_summoner(summId):
                 infoList.append('{}:{}\n'.format(k,v))
             elif k == 'chest granted':
                 infoList.append('{}:{}\n-----------------------\n'.format(k,v))
-     
+
     return infoList
 
 #gets image for each item id
@@ -218,18 +221,12 @@ def getitem(item):
 #returns path to the image of item
 
     pwd = os.getcwd()
-    if os.path.isfile('{}/items/{}.png'.format(pwd,item)) == False:
+    if os.path.isfile('{}\\items\\{}.png'.format(pwd,item)) == False:
         response = requests.get('http://ddragon.leagueoflegends.com/cdn/9.1.1/img/item/{}.png'.format(item))
 
         time.sleep(.75)
 
         if response.status_code == 200:
-            with open('{}/items/{}.png'.format(pwd,item),'wb') as f:
+            with open('{}\\items\\{}.png'.format(pwd,item),'wb') as f:
                 f.write(response.content)
-    return "{}/items/{}.png".format(pwd,item)
-    
-        
-            
-                
-            
-
+    return "{}\\items\\{}.png".format(pwd,item)
