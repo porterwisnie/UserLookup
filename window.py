@@ -7,6 +7,8 @@ import PIL.ImageTk
 from tkinter import *
 import champids
 import queuetypes
+import os
+from sys import platform
 
 class Window(Frame):
 
@@ -20,7 +22,7 @@ class Window(Frame):
         #used by the find_summoner method and the more_stats function for identifying which game was clicked
         self.gamenum = 0
         self.itemImages = []
-
+        
         master.bind('<Return>',self.find_summoner_enter)
 
 
@@ -460,6 +462,14 @@ if __name__=='__main__':
     root = Tk()
 
     root.geometry("1600x950")
+    if platform == 'Windows':
+
+        root.iconbitmap(os.getcwd()+'/3089.ico')
+
+    else:
+        
+        img = Image("photo",file=os.getcwd()+'/items/3089.png')
+        root.tk.call('wm','iconphoto',root._w,img)
 
     app = Window(root)
 
