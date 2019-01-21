@@ -121,14 +121,12 @@ class Window(Frame):
         popup.config(bg='gray75')
 
 
-<<<<<<< HEAD
-=======
     def find_summoner_enter(self,event=None):
         
         self.find_summoner()
    
     
->>>>>>> master
+
     def find_summoner(self):
         try:
 
@@ -385,14 +383,9 @@ class Window(Frame):
 
 
                 for item in item_list:
-<<<<<<< HEAD
-                    photo = PIL.Image.open(item[2])
 
-                    image = PIL.ImageTk.PhotoImage(file=photo)
+              
 
-                    ptextArea.create_image((item[0],item[1]),image=photo,anchor='w')
-
-=======
                     
                     item_image = PIL.Image.open(item[2])
 
@@ -404,7 +397,7 @@ class Window(Frame):
 
                     self.itemImages.append(itemimg)
  
->>>>>>> master
+
                 team2ypos +=40
             else:
 
