@@ -15,7 +15,7 @@ global leadUrl
 #test comment for ssh test
 
 global apiKey
-apiKey = 'RGAPI-befac1d3-0114-400b-96d9-cccacb3ebba8'
+apiKey = 'RGAPI-83be51a9-b0e8-4f3b-bd17-d2a8b6fa4b51'
 
 global summId
 
@@ -33,7 +33,7 @@ def sumLookup(summId,lookup):
 
         if lookup == 'base':
 
-            leadUrl = 'lol/summoner/v3/summoners/by-name'
+            leadUrl = 'lol/summoner/v4/summoners/by-name'
 
             summId = 'PorterW'
 
@@ -41,7 +41,7 @@ def sumLookup(summId,lookup):
 
         elif lookup == 'champ masters':
 
-            leadUrl = 'lol/summoner/v3/summoners/by-name'
+            leadUrl = 'lol/summoner/v4/summoners/by-name'
             #first request finds the summoner Id number for the name given in the search
             response = requests.get('https://na1.api.riotgames.com/{}/{}?api_key={}'.format(leadUrl,summId,apiKey))
 
@@ -49,42 +49,27 @@ def sumLookup(summId,lookup):
 
             x = soup.get_text()
         
-            comma_seperated = x.split(',')
-    
-            dictionary = {}
-    
-            for item in comma_seperated:
+            js_response = json.loads(x)
 
-                splitvalue = item.split(':')
-
-                dictionary[splitvalue[0]] = splitvalue[1]
+        
             #summoner Id is equal to the number value given by riot games here 
-            summId = dictionary['{"id"']
+            summId = js_response['id']
 
-            leadUrl = 'lol/champion-mastery/v3/champion-masteries/by-summoner'
+            leadUrl = 'lol/champion-mastery/v4/champion-masteries/by-summoner'
             return [summId,leadUrl]
         elif lookup == 'recent matches':
 
-            leadUrl = 'lol/summoner/v3/summoners/by-name'
+            leadUrl = 'lol/summoner/v4/summoners/by-name'
             #first request finds the summoner Id number for the name given in the search
             response = requests.get('https://na1.api.riotgames.com/{}/{}?api_key={}'.format(leadUrl,summId,apiKey))
 
             soup = bs4(response.text,'lxml')
 
-            x = soup.get_text()
-        
-            comma_seperated = x.split(',')
-    
-            dictionary = {}
-    
-            for item in comma_seperated:
+            x = soup.get_text() 
 
-                splitvalue = item.split(':')
-
-                dictionary[splitvalue[0]] = splitvalue[1]
+            js_response = json.loads(x)
             #summoner Id is equal to the number value given by riot games here 
-            
-            summId = dictionary['\"accountId\"']
+            summId = js_response['accountId']
 
             return summId
             
@@ -120,7 +105,7 @@ def basic_info(summId,lookup):
 def recent_matches(summId):
     summId = sumLookup(summId,'recent matches')
 
-    leadUrl = 'lol/match/v3/matchlists/by-account'
+    leadUrl = 'lol/match/v4/matchlists/by-account'
 
     response = requests.get('https://na1.api.riotgames.com/{}/{}?endIndex=20&api_key={}'.format(leadUrl,summId,apiKey))
    
@@ -130,6 +115,8 @@ def recent_matches(summId):
 
     json_response = json.loads(x)
 
+    
+    
     return json_response['matches'] 
 
 def indepth_game(summId):
@@ -137,7 +124,7 @@ def indepth_game(summId):
 
     game_id = json_response[0]['gameId']
 
-    leadUrl = 'lol/match/v3/matches'
+    leadUrl = 'lol/match/v4/matches'
 
     response = requests.get('https://na1.api.riotgames.com/{}/{}?api_key={}'.format(leadUrl,game_id,apiKey))
 
@@ -151,7 +138,7 @@ def indepth_game(summId):
 
 def game_byId(gameId):
 
-    leadUrl = 'lol/match/v3/matches'
+    leadUrl = 'lol/match/v4/matches'
 
     response = requests.get('https://na1.api.riotgames.com/{}/{}?api_key={}'.format(leadUrl,gameId,apiKey))
 
@@ -222,7 +209,7 @@ def getitem(item):
 
     pwd = os.getcwd()
     if os.path.isfile('{}/items/{}.png'.format(pwd,item)) == False:
-        response = requests.get('http://ddragon.leagueoflegends.com/cdn/9.1.1/img/item/{}.png'.format(item))
+        response = requests.get('http://ddragon.leagueoflegends.com/cdn/9.2.1/img/item/{}.png'.format(item))
 
         time.sleep(.75)
 

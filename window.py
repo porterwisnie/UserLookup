@@ -9,6 +9,7 @@ import champids
 import queuetypes
 import os
 from sys import platform
+import livegame
 
 class Window(Frame):
 
@@ -72,6 +73,7 @@ class Window(Frame):
 
         options = [
                 'Match History',
+                'Live Game',
                 'Champion Mastery'
                 ]
         #defines the game lookup by id search field
@@ -145,6 +147,25 @@ class Window(Frame):
 
             userId = self.lookupName.get()
 
+            if self.option.get() == 'Live Game':
+
+                response = livegame.live_game(userId)
+                t1x = 0
+                t1y = 0
+                t2x = 500
+                t2y = 0
+                for resp in response:
+                    if resp['teamId'] == 100:
+
+                        textId = self.textArea.create_text((t1x,t1y),anchor='nw',text=resp)
+                        t1y += 100
+                    elif resp['teamid'] == 200:
+                        
+                        textId = self.textArea.create_text((t2x,t2y),anchor='nw',text=resp)
+                        t2y +=100
+                        
+
+
             if self.option.get() == 'Champion Mastery':
 
             
@@ -205,7 +226,11 @@ class Window(Frame):
 
                     self.gamenum += 1
 
+                    lanepos = {'TOP':0,'JUNGLE':40,'MID':80,'MIDDLE':80,'BOT':120,'BOTTOM':120}
+
                     for participant in range(0,10):
+
+                        availible = [0,40,80,120,160]
 
                         indiv_data = game['participants'][participant] 
 
@@ -227,20 +252,25 @@ class Window(Frame):
 
                             xpos = 550
 
+                            
                             self.textArea.create_text((xpos,team2ypos),text=str(identity[participant]['player']['summonerName'])+'\n   '+str(champids.champion_ids[indiv_data['championId']])+'   '+str(indiv_data['stats']['kills'])+'/'+str(indiv_data['stats']['deaths'])+'/'+str(indiv_data['stats']['assists']),anchor='w')
                             
-                            team2ypos +=40
+                            team2ypos += 40
                         else:
                             xpos = 50
-     
+                            
+                                                       
                             self.textArea.create_text((xpos,ypos),text=str(identity[participant]['player']['summonerName'])+'\n   '+str(champids.champion_ids[indiv_data['championId']])+'   '+str(indiv_data['stats']['kills'])+'/'+str(indiv_data['stats']['deaths'])+'/'+str(indiv_data['stats']['assists']),anchor='w')
             
-                            ypos += 40
+                            ypos += 40 
 
                         if participant == 9:            
                            
                             self.textArea.tag_bind(per_game_area,'<Button-1>',self.ongame_click)
 
+                            team2ypos += 20
+
+                            ypos += 20
 
 
 

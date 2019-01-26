@@ -107,6 +107,7 @@ champion_ids = {
     37:"Sona",
     16:"Soraka",
     50:"Swain",
+    517:"Sylas",
     134:"Syndra",
     223:"TahmKench",
     163:"Taliyah",
